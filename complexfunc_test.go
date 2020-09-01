@@ -1,8 +1,8 @@
 package complexfunc_test
 
 import (
+	"github.com/MakotoNaruse/complexfunc"
 	"golang.org/x/tools/go/analysis/analysistest"
-	"practice/complexfunc"
 	"testing"
 )
 

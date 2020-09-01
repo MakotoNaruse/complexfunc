@@ -1,4 +1,4 @@
-module practice/complexfunc
+module github.com/MakotoNaruse/complexfunc
 
 go 1.14
 
