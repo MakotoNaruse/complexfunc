@@ -48,3 +48,14 @@ func f3() int {
 	return 1
 }
 
+func f4() int {
+	num := []int{1,2,3,4,5}
+	ans := 0
+	for i := range num {
+		if i % 2 == 0 {
+			ans += i
+		}
+	}
+	return ans
+}
+
