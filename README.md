@@ -1,4 +1,6 @@
 # complexfunc
+[![Go Report Card](https://goreportcard.com/badge/github.com/MakotoNaruse/complexfunc)](https://goreportcard.com/report/github.com/MakotoNaruse/complexfunc)
+
 
 WIP
 
