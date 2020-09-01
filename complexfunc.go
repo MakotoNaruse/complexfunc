@@ -93,6 +93,9 @@ func calcComplex(stmts []ast.Stmt) int {
 		case *ast.ForStmt:
 			frs, _ := stmt.(*ast.ForStmt)
 			complex += 1 + calcComplex(frs.Body.List)
+		case *ast.RangeStmt:
+			rgs, _ := stmt.(*ast.RangeStmt)
+			complex += 1 + calcComplex(rgs.Body.List)
 		case *ast.SwitchStmt:
 			sws, _ := stmt.(*ast.SwitchStmt)
 			complex += calcComplex(sws.Body.List)
