@@ -3,7 +3,6 @@ package complexfunc
 import (
 	"fmt"
 	"go/ast"
-
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
 	"golang.org/x/tools/go/ast/inspector"
@@ -50,7 +49,7 @@ func calcComplex(stmts []ast.Stmt) int {
 			fmt.Println("if cause", ifs.Pos())
 			complex += 1 + calcComplex(ifs.Body.List)
 			if ifs.Else != nil {
-				switch ifs.Else.(type){
+				switch ifs.Else.(type) {
 				case *ast.IfStmt:
 					complex += calcComplex([]ast.Stmt{ifs.Else})
 				default:
@@ -74,4 +73,3 @@ func calcComplex(stmts []ast.Stmt) int {
 	}
 	return complex
 }
-

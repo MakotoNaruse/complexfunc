@@ -1,9 +1,8 @@
 package main
 
 import (
-	"practice/complexfunc"
 	"golang.org/x/tools/go/analysis/unitchecker"
+	"practice/complexfunc"
 )
 
 func main() { unitchecker.Main(complexfunc.Analyzer) }
-

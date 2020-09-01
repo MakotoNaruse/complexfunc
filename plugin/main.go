@@ -5,10 +5,9 @@
 package main
 
 import (
-	"strings"
-
-	"practice/complexfunc"
 	"golang.org/x/tools/go/analysis"
+	"practice/complexfunc"
+	"strings"
 )
 
 // flags for Analyzer.Flag.
@@ -33,4 +32,3 @@ func (analyzerPlugin) GetAnalyzers() []*analysis.Analyzer {
 		complexfunc.Analyzer,
 	}
 }
-
