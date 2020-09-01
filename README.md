@@ -1,6 +1,6 @@
 # complexfunc
 [![Go Report Card](https://goreportcard.com/badge/github.com/MakotoNaruse/complexfunc)](https://goreportcard.com/report/github.com/MakotoNaruse/complexfunc)
-![Go test](https://github.com/MakotoNaruse/complexfunc/workflows/Go%20test/badge.svg?branch=master)
+[![Go test](https://github.com/MakotoNaruse/complexfunc/workflows/Go%20test/badge.svg?branch=master)](https://github.com/MakotoNaruse/complexfunc/actions)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
 WIP
