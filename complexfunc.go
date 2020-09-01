@@ -49,28 +49,23 @@ func calcComplex(stmts []ast.Stmt) int {
 		switch stmt.(type) {
 		case *ast.IfStmt:
 			ifs, _ := stmt.(*ast.IfStmt)
-			fmt.Println("if cause", ifs.Pos())
 			complex += 1 + calcComplex(ifs.Body.List)
 			if ifs.Else != nil {
 				switch ifs.Else.(type) {
 				case *ast.IfStmt:
 					complex += calcComplex([]ast.Stmt{ifs.Else})
 				default:
-					fmt.Println("else cause", ifs.Else.Pos())
 					complex += 1 + calcComplex([]ast.Stmt{ifs.Else})
 				}
 			}
 		case *ast.ForStmt:
 			frs, _ := stmt.(*ast.ForStmt)
-			fmt.Println("for cause", frs.Pos())
 			complex += 1 + calcComplex(frs.Body.List)
 		case *ast.SwitchStmt:
 			sws, _ := stmt.(*ast.SwitchStmt)
-			fmt.Println("switch cause", sws.Pos())
 			complex += calcComplex(sws.Body.List)
 		case *ast.CaseClause:
 			cas, _ := stmt.(*ast.CaseClause)
-			fmt.Println("case cause", cas.Pos())
 			complex += 1 + calcComplex(cas.Body)
 		}
 	}
