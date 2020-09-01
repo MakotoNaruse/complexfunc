@@ -87,12 +87,8 @@ func calcComplex(stmts []ast.Stmt) int {
 			ifs, _ := stmt.(*ast.IfStmt)
 			complex += 1 + calcComplex(ifs.Body.List)
 			if ifs.Else != nil {
-				switch ifs.Else.(type) {
-				case *ast.IfStmt:
-					complex += calcComplex([]ast.Stmt{ifs.Else})
-				default:
-					complex += 1 + calcComplex([]ast.Stmt{ifs.Else})
-				}
+				// else if can in ifs.Else
+				complex += calcComplex([]ast.Stmt{ifs.Else})
 			}
 		case *ast.ForStmt:
 			frs, _ := stmt.(*ast.ForStmt)
