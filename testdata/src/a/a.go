@@ -15,7 +15,7 @@ func f1() int {
 	return ans
 }
 
-func f2() int {
+func f2() int { // want "function f2 is too complicated 12 > 10"
 	n := 10
 	switch n {
 	case 1:

@@ -34,6 +34,9 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			complex := 1
 			complex += calcComplex(n.Body.List)
 			fmt.Println("complex", complex)
+			if complex > 10 {
+				pass.Reportf(n.Pos(), "function %s is too complicated %d > 10", n.Name.Name, complex)
+			}
 		}
 	})
 
