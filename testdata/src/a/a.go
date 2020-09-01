@@ -44,3 +44,7 @@ func f2() int { // want "function f2 is too complicated 12 > 10"
 	return n
 }
 
+func f3() int {
+	return 1
+}
+
