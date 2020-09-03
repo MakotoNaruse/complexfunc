@@ -61,7 +61,7 @@ func complexity(fn *ssa.Function) int {
 	return edges - nodes + 2
 }
 
-func calcByAST(pass *analysis.Pass) (interface{}, error) { //changed
+func calcByAST(pass *analysis.Pass) (interface{}, error) {
 	inspect := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 
 	nodeFilter := []ast.Node{
