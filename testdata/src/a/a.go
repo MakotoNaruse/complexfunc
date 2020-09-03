@@ -64,13 +64,3 @@ func f4() int {
 	return ans
 }
 
-func f5() {
-	num := 0
-	f := false
-	t := true
-	if f || t {
-		if f {
-			num++
-		}
-	}
-}
