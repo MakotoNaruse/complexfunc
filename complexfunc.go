@@ -3,6 +3,7 @@ package complexfunc
 import (
 	"fmt"
 	"go/ast"
+	"go/token"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/buildssa"
 	"golang.org/x/tools/go/analysis/passes/inspect"
@@ -35,8 +36,8 @@ func run(pass *analysis.Pass) (interface{}, error) {
 func calcBySSA(pass *analysis.Pass) (interface{}, error) {
 	s := pass.ResultOf[buildssa.Analyzer].(*buildssa.SSA)
 	for _, f := range s.SrcFuncs {
+		fmt.Println("func name:", f.Name())
 		complex := complexity(f)
-		fmt.Println("func name:",f.Name())
 		fmt.Println("complex:", complex)
 		if complex > 10 {
 			pass.Reportf(f.Pos(), "function %s is too complicated %d > 10", f.Name(), complex)
@@ -46,17 +47,19 @@ func calcBySSA(pass *analysis.Pass) (interface{}, error) {
 }
 func complexity(fn *ssa.Function) int {
 	/*
-	https://en.wikipedia.org/wiki/Cyclomatic_complexity
-	The complexity M for a function is defined as
-	M = E − N + 2
-	E = the number of edges.
-	N = the number of nodes.
+		https://en.wikipedia.org/wiki/Cyclomatic_complexity
+		The complexity M for a function is defined as
+		M = E − N + 2
+		E = the number of edges.
+		N = the number of nodes.
 	*/
 	edges := 0
 	for _, b := range fn.Blocks {
 		edges += len(b.Succs)
 	}
-	return edges - len(fn.Blocks) + 2
+	nodes := len(fn.Blocks)
+	fmt.Println("n:", nodes, "e:", edges)
+	return edges - nodes + 2
 }
 
 func calcByAST(pass *analysis.Pass) (interface{}, error) {
@@ -71,37 +74,25 @@ func calcByAST(pass *analysis.Pass) (interface{}, error) {
 		case *ast.FuncDecl:
 			fmt.Println("func name:", n.Name)
 			complex := 1
-			complex += calcComplex(n.Body.List)
+			complex += calcComplex(n)
 			fmt.Println("complex", complex)
 		}
 	})
 	return nil, nil
 }
 
-func calcComplex(stmts []ast.Stmt) int {
+func calcComplex(node ast.Node) int {
 	complex := 0
-	for _, stmt := range stmts {
-		switch stmt.(type) {
-		case *ast.IfStmt:
-			ifs, _ := stmt.(*ast.IfStmt)
-			complex += 1 + calcComplex(ifs.Body.List)
-			if ifs.Else != nil {
-				// "else if" can occur in ifs.Else
-				complex += calcComplex([]ast.Stmt{ifs.Else})
+	ast.Inspect(node, func(n ast.Node) bool {
+		switch n := n.(type) {
+		case *ast.IfStmt, *ast.ForStmt, *ast.RangeStmt, *ast.CaseClause, *ast.CommClause:
+			complex++
+		case *ast.BinaryExpr:
+			if n.Op == token.LAND || n.Op == token.LOR {
+				complex++
 			}
-		case *ast.ForStmt:
-			frs, _ := stmt.(*ast.ForStmt)
-			complex += 1 + calcComplex(frs.Body.List)
-		case *ast.RangeStmt:
-			rgs, _ := stmt.(*ast.RangeStmt)
-			complex += 1 + calcComplex(rgs.Body.List)
-		case *ast.SwitchStmt:
-			sws, _ := stmt.(*ast.SwitchStmt)
-			complex += calcComplex(sws.Body.List)
-		case *ast.CaseClause:
-			cas, _ := stmt.(*ast.CaseClause)
-			complex += 1 + calcComplex(cas.Body)
 		}
-	}
+		return true
+	})
 	return complex
 }

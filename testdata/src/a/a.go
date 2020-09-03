@@ -44,8 +44,13 @@ func f2() int { // want "function f2 is too complicated 12 > 10"
 	return n
 }
 
-func f3() int {
-	return 1
+func f3() bool {
+	n := 0
+	if n%2 == 0{
+		n++
+	}
+	b := n%2 == 0 && n%3 == 0
+	return b
 }
 
 func f4() int {
@@ -57,4 +62,15 @@ func f4() int {
 		}
 	}
 	return ans
+}
+
+func f5() {
+	num := 0
+	f := false
+	t := true
+	if f || t {
+		if f {
+			num++
+		}
+	}
 }

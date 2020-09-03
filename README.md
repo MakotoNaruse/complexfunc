@@ -71,7 +71,7 @@ complex: 12
 
 ## how to calculate?
 ### By AST
-Counting nodes of `if` `for (range)` `case (in switch)`.
+Counting nodes of `if` `for (range)` `case (in switch)` `&&` `||`.
 ### By SSA
 Define G as the control graph obtained from SSA, 
 cyclomatic complexity C is calculated as follows.
