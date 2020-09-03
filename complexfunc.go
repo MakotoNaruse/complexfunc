@@ -77,6 +77,31 @@ func calcByAST(pass *analysis.Pass) (interface{}, error) {
 			complex += calcComplex(n)
 			fmt.Println("complex", complex)
 		}
+		num := 10
+		switch num {
+		case 1:
+			num++
+		case 2:
+			num++
+		case 3:
+			num++
+		case 4:
+			num++
+		case 5:
+			num++
+		case 6:
+			num++
+		case 7:
+			num++
+		case 8:
+			num++
+		case 9:
+			if num%10 == 0 {
+				num++
+			}
+		case 10:
+			num++
+		}
 	})
 	return nil, nil
 }
