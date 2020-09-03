@@ -1,5 +1,5 @@
 runner:
   govet:
-    cmd: go vet -vettool=`which complecfunc` .
+    cmd: go vet -all .
     errorformat:
       - "%f:%l:%c: %m"

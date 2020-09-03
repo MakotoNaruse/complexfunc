@@ -25,5 +25,5 @@ jobs:
         run: go get github.com/MakotoNaruse/complexfunc/cmd/complexfunc
 
       - name: Go vet
-        run: go vet -vettool=`which complecfunc` .
+        run: go vet -all .
 
