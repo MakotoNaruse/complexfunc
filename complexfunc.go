@@ -29,7 +29,6 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	calcByAST(pass)
 	fmt.Println("Calculated by SSA and Control Graph")
 	calcBySSA(pass)
-
 	return nil, nil
 }
 
@@ -45,6 +44,7 @@ func calcBySSA(pass *analysis.Pass) (interface{}, error) {
 	}
 	return nil, nil
 }
+
 func complexity(fn *ssa.Function) int {
 	/*
 		https://en.wikipedia.org/wiki/Cyclomatic_complexity
