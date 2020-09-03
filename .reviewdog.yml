@@ -1,5 +1,5 @@
 runner:
   govet:
-    cmd: go vet -vettool=$(which complexfunc)  .
+    cmd: go get github.com/MakotoNaruse/complexfunc/cmd/complexfunc | go vet -vettool=$(which complexfunc)  .
     errorformat:
       - "%f:%l:%c: %m"
