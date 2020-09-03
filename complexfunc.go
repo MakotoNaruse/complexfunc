@@ -36,19 +36,22 @@ func calcBySSA(pass *analysis.Pass) (interface{}, error) {
 	s := pass.ResultOf[buildssa.Analyzer].(*buildssa.SSA)
 	for _, f := range s.SrcFuncs {
 		complex := complexity(f)
-		fmt.Println("func name:",f)
+		fmt.Println("func name:",f.Name())
 		fmt.Println("complex:", complex)
+		if complex > 10 {
+			pass.Reportf(f.Pos(), "function %s is too complicated %d > 10", f.Name(), complex)
+		}
 	}
 	return nil, nil
 }
 func complexity(fn *ssa.Function) int {
-	// https://en.wikipedia.org/wiki/Cyclomatic_complexity
-	// The complexity M for a function is defined as
-	// M = E − N + 2
-	// where
-	//
-	// E = the number of edges of the graph.
-	// N = the number of nodes of the graph.
+	/*
+	https://en.wikipedia.org/wiki/Cyclomatic_complexity
+	The complexity M for a function is defined as
+	M = E − N + 2
+	E = the number of edges.
+	N = the number of nodes.
+	*/
 	edges := 0
 	for _, b := range fn.Blocks {
 		edges += len(b.Succs)
@@ -70,12 +73,8 @@ func calcByAST(pass *analysis.Pass) (interface{}, error) {
 			complex := 1
 			complex += calcComplex(n.Body.List)
 			fmt.Println("complex", complex)
-			if complex > 10 {
-				pass.Reportf(n.Pos(), "function %s is too complicated %d > 10", n.Name.Name, complex)
-			}
 		}
 	})
-
 	return nil, nil
 }
 
@@ -87,7 +86,7 @@ func calcComplex(stmts []ast.Stmt) int {
 			ifs, _ := stmt.(*ast.IfStmt)
 			complex += 1 + calcComplex(ifs.Body.List)
 			if ifs.Else != nil {
-				// else if can in ifs.Else
+				// "else if" can occur in ifs.Else
 				complex += calcComplex([]ast.Stmt{ifs.Else})
 			}
 		case *ast.ForStmt:
