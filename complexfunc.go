@@ -9,6 +9,7 @@ import (
 	"golang.org/x/tools/go/analysis/passes/inspect"
 	"golang.org/x/tools/go/ast/inspector"
 	"golang.org/x/tools/go/ssa"
+	"sort"
 )
 
 const doc = "complexfunc is ..."
@@ -24,25 +25,55 @@ var Analyzer = &analysis.Analyzer{
 	},
 }
 
-func run(pass *analysis.Pass) (interface{}, error) {
-	fmt.Println("Calculated by AST Search")
-	calcByAST(pass)
-	fmt.Println("Calculated by SSA and Control Graph")
-	calcBySSA(pass)
-	return nil, nil
+type score struct {
+	PkgName  string
+	FuncName string
+	astCmp   int
+	ssaCmp   int
+	Pos      token.Pos
 }
 
-func calcBySSA(pass *analysis.Pass) (interface{}, error) {
-	s := pass.ResultOf[buildssa.Analyzer].(*buildssa.SSA)
-	for _, f := range s.SrcFuncs {
-		fmt.Println("func name:", f.Name())
-		complex := complexity(f)
-		fmt.Println("complex:", complex)
-		if complex > 10 {
-			pass.Reportf(f.Pos(), "function %s is too complicated %d > 10", f.Name(), complex)
+func (s score) String() string {
+	return fmt.Sprintf("function: %s.%s\nscore by ast: %d\nscore by ssa: %d", s.PkgName, s.FuncName, s.astCmp, s.ssaCmp)
+}
+
+func run(pass *analysis.Pass) (interface{}, error) {
+	scores := map[token.Pos]score{}
+
+	resultBySsa := calcBySSA(pass, scores)
+	result := calcByAST(pass, resultBySsa)
+	// sort by pos
+	var keys []int
+	for k := range result {
+		keys = append(keys, int(k))
+	}
+	sort.Ints(keys)
+	for _, k := range keys {
+		pos := token.Pos(k)
+		score := scores[pos]
+		fmt.Println(score)
+		if score.astCmp > 10 {
+			pass.Reportf(pos, "function %s.%s is too complicated %d > 10", score.PkgName, score.FuncName, score.astCmp)
+		}
+		if score.ssaCmp < score.astCmp {
+			pass.Reportf(pos, "function %s.%s has redundant branch", score.PkgName, score.FuncName)
 		}
 	}
 	return nil, nil
+}
+
+func calcBySSA(pass *analysis.Pass, scores map[token.Pos]score) map[token.Pos]score {
+	s := pass.ResultOf[buildssa.Analyzer].(*buildssa.SSA)
+	for _, f := range s.SrcFuncs {
+		scores[f.Pos()] = score{
+			PkgName:  f.Pkg.Pkg.Name(),
+			FuncName: f.Name(),
+			astCmp:   0,
+			ssaCmp:   complexity(f),
+			Pos:      f.Pos(),
+		}
+	}
+	return scores
 }
 
 func complexity(fn *ssa.Function) int {
@@ -58,11 +89,11 @@ func complexity(fn *ssa.Function) int {
 		edges += len(b.Succs)
 	}
 	nodes := len(fn.Blocks)
-	fmt.Println("n:", nodes, "e:", edges)
+	//fmt.Println("n:", nodes, "e:", edges)
 	return edges - nodes + 2
 }
 
-func calcByAST(pass *analysis.Pass) (interface{}, error) {
+func calcByAST(pass *analysis.Pass, scores map[token.Pos]score) map[token.Pos]score {
 	inspect := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 
 	nodeFilter := []ast.Node{
@@ -72,14 +103,14 @@ func calcByAST(pass *analysis.Pass) (interface{}, error) {
 	inspect.Preorder(nodeFilter, func(n ast.Node) {
 		switch n := n.(type) {
 		case *ast.FuncDecl:
-			fmt.Println("func name:", n.Name)
-			complex := 1
-			complex += calcComplex(n)
-			fmt.Println("complex", complex)
+			score , ok := scores[n.Name.NamePos]
+			if !ok { return }
+			score.astCmp = 1 + calcComplex(n)
+			scores[n.Name.NamePos] = score
 		}
 	})
 
-	return nil, nil
+	return scores
 }
 
 func calcComplex(node ast.Node) int {

@@ -15,7 +15,7 @@ func f1() int {
 	return ans
 }
 
-func f2() int { // want "function f2 is too complicated 12 > 10"
+func f2() int { // want "function a.f2 is too complicated 12 > 10"
 	n := 10
 	switch n {
 	case 1:
@@ -76,4 +76,11 @@ func f5() int {
 		ans = -1
 	}
 	return ans
+}
+
+func f6() { // want "function a.f6 has redundant branch"
+	a := 0
+	if false {
+	}
+	a++
 }
