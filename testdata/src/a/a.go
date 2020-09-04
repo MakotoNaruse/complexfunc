@@ -40,6 +40,8 @@ func f2() int { // want "function f2 is too complicated 12 > 10"
 		}
 	case 10:
 		n++
+	default:
+		n++
 	}
 	return n
 }
@@ -63,4 +65,3 @@ func f4() int {
 	}
 	return ans
 }
-

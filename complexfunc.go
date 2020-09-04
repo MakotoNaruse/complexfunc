@@ -1,6 +1,7 @@
 package complexfunc
 
 import (
+	"fmt"
 	"go/ast"
 	"go/token"
 	"golang.org/x/tools/go/analysis"
@@ -24,9 +25,9 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
-	//fmt.Println("Calculated by AST Search")
+	fmt.Println("Calculated by AST Search")
 	calcByAST(pass)
-	//fmt.Println("Calculated by SSA and Control Graph")
+	fmt.Println("Calculated by SSA and Control Graph")
 	calcBySSA(pass)
 	return nil, nil
 }
@@ -34,9 +35,9 @@ func run(pass *analysis.Pass) (interface{}, error) {
 func calcBySSA(pass *analysis.Pass) (interface{}, error) {
 	s := pass.ResultOf[buildssa.Analyzer].(*buildssa.SSA)
 	for _, f := range s.SrcFuncs {
-		//fmt.Println("func name:", f.Name())
+		fmt.Println("func name:", f.Name())
 		complex := complexity(f)
-		//fmt.Println("complex:", complex)
+		fmt.Println("complex:", complex)
 		if complex > 10 {
 			pass.Reportf(f.Pos(), "function %s is too complicated %d > 10", f.Name(), complex)
 		}
@@ -57,37 +58,11 @@ func complexity(fn *ssa.Function) int {
 		edges += len(b.Succs)
 	}
 	nodes := len(fn.Blocks)
-	//fmt.Println("n:", nodes, "e:", edges)
+	fmt.Println("n:", nodes, "e:", edges)
 	return edges - nodes + 2
 }
 
 func calcByAST(pass *analysis.Pass) (interface{}, error) {
-	num := 10
-	switch num {
-	case 1:
-		num++
-	case 2:
-		num++
-	case 3:
-		num++
-	case 4:
-		num++
-	case 5:
-		num++
-	case 6:
-		num++
-	case 7:
-		num++
-	case 8:
-		num++
-	case 9:
-		if num%10 == 0 {
-			num++
-		}
-	case 10:
-		num++
-	}
-	
 	inspect := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 
 	nodeFilter := []ast.Node{
@@ -97,10 +72,10 @@ func calcByAST(pass *analysis.Pass) (interface{}, error) {
 	inspect.Preorder(nodeFilter, func(n ast.Node) {
 		switch n := n.(type) {
 		case *ast.FuncDecl:
-			//fmt.Println("func name:", n.Name)
+			fmt.Println("func name:", n.Name)
 			complex := 1
 			complex += calcComplex(n)
-			//fmt.Println("complex", complex)
+			fmt.Println("complex", complex)
 		}
 	})
 
