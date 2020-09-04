@@ -36,7 +36,7 @@ func f2() int { // want "function a.f2 is too complicated 12 > 10"
 		n++
 	case 9:
 		if n%10 == 0 {
-			n++
+			return n
 		}
 	case 10:
 		n++

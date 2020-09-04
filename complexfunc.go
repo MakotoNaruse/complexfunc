@@ -10,6 +10,8 @@ import (
 	"golang.org/x/tools/go/analysis/passes/inspect"
 	"golang.org/x/tools/go/ast/inspector"
 	"golang.org/x/tools/go/ssa"
+	"gonum.org/v1/gonum/graph/path"
+	"gonum.org/v1/gonum/graph/simple"
 	"sort"
 )
 
@@ -27,7 +29,7 @@ var Analyzer = &analysis.Analyzer{
 }
 
 var (
-	over  int
+	over int
 )
 
 func init() {
@@ -81,6 +83,7 @@ func calcBySSA(pass *analysis.Pass, scores map[token.Pos]score) map[token.Pos]sc
 			ssaCmp:   complexity(f),
 			Pos:      f.Pos(),
 		}
+		showDepth(f)
 	}
 	return scores
 }
@@ -105,8 +108,41 @@ func complexity(fn *ssa.Function) int {
 		}
 	}
 	nodes := len(fn.Blocks)
-	//fmt.Println("n:", nodes, "e:", edges)
+	fmt.Println("n:", nodes, "e:", edges)
+	fmt.Println("score:",edges - nodes + 2 + returns - 1)
 	return edges - nodes + 2 + returns - 1
+}
+
+func showDepth(fn *ssa.Function) {
+	if len(fn.Blocks) == 1 {
+		fmt.Println("no edge")
+		return
+	}
+	graph := simple.NewDirectedGraph()
+	var returns []int
+	for _, b := range fn.Blocks {
+		for _, s := range b.Succs {
+			from := simple.Node(b.Index)
+			to := simple.Node(s.Index)
+			edge := simple.Edge{
+				F: from,
+				T: to,
+			}
+			graph.SetEdge(edge)
+		}
+		for _, instr := range b.Instrs {
+			switch instr.(type) {
+			case *ssa.Return:
+				returns = append(returns, b.Index)
+			}
+		}
+	}
+	fmt.Println(graph.Edges())
+	fmt.Println(returns)
+	allShortest := path.DijkstraAllPaths(graph)
+	for _, r := range returns {
+		fmt.Println("to", r, allShortest.Weight(0,int64(r)))
+	}
 }
 
 func calcByAST(pass *analysis.Pass, scores map[token.Pos]score) map[token.Pos]score {
@@ -119,8 +155,10 @@ func calcByAST(pass *analysis.Pass, scores map[token.Pos]score) map[token.Pos]sc
 	inspect.Preorder(nodeFilter, func(n ast.Node) {
 		switch n := n.(type) {
 		case *ast.FuncDecl:
-			score , ok := scores[n.Name.NamePos]
-			if !ok { return }
+			score, ok := scores[n.Name.NamePos]
+			if !ok {
+				return
+			}
 			score.astCmp = 1 + calcComplex(n)
 			scores[n.Name.NamePos] = score
 		}
