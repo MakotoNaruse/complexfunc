@@ -65,3 +65,15 @@ func f4() int {
 	}
 	return ans
 }
+
+func f5() int {
+	ans := 0
+	var ch chan int
+	select {
+	case v := <- ch:
+		ans = v
+	default:
+		ans = -1
+	}
+	return ans
+}
