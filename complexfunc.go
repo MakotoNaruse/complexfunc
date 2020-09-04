@@ -76,6 +76,10 @@ func (s score) String() string {
 func calcBySSA(pass *analysis.Pass, scores map[token.Pos]score) map[token.Pos]score {
 	s := pass.ResultOf[buildssa.Analyzer].(*buildssa.SSA)
 	for _, f := range s.SrcFuncs {
+		// anon func
+		if f.Parent() != nil {
+			continue
+		}
 		scores[f.Pos()] = score{
 			PkgName:  f.Pkg.Pkg.Name(),
 			FuncName: f.Name(),
@@ -108,9 +112,12 @@ func complexity(fn *ssa.Function) int {
 		}
 	}
 	nodes := len(fn.Blocks)
-	//fmt.Println("n:", nodes, "e:", edges)
-	//fmt.Println("score:",edges - nodes + 2 + returns - 1)
-	return edges - nodes + 2 + returns - 1
+	cyclo := edges - nodes + 2 + returns - 1
+	// find anon funcs
+	for _, af := range fn.AnonFuncs {
+		cyclo += complexity(af) - 1
+	}
+	return cyclo
 }
 
 func showDepth(fn *ssa.Function) {
@@ -141,7 +148,7 @@ func showDepth(fn *ssa.Function) {
 	//fmt.Println(returns)
 	allShortest := path.DijkstraAllPaths(graph)
 	for _, r := range returns {
-		fmt.Println("to", r, allShortest.Weight(0,int64(r)))
+		fmt.Println("to", r, allShortest.Weight(0, int64(r)))
 	}
 }
 

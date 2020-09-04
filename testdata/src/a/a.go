@@ -47,20 +47,20 @@ func f2() int { // want "function a.f2 is too complicated 12 > 10"
 }
 
 func f3(n int) bool {
-	if n%2 == 0{
+	if n%2 == 0 {
 		return true
 	}
-	if n % 3 == 0 {
+	if n%3 == 0 {
 		return true
 	}
 	return false
 }
 
 func f4() int {
-	num := []int{1,2,3,4,5}
+	num := []int{1, 2, 3, 4, 5}
 	ans := 0
 	for i := range num {
-		if i % 2 == 0 {
+		if i%2 == 0 {
 			ans += i
 		}
 	}
@@ -71,7 +71,7 @@ func f5() int {
 	ans := 0
 	var ch chan int
 	select {
-	case v := <- ch:
+	case v := <-ch:
 		ans = v
 	default:
 		ans = -1
@@ -94,4 +94,19 @@ func f7() int {
 		a = 1
 	}
 	return a
+}
+
+func f8() int {
+	num := 10
+	ans := 0
+	for i := 0; i < num; i++ {
+		ans++
+	}
+	x := func(n int) int {
+		if n%2 == 0 {
+			return n + 1
+		}
+		return n
+	}
+	return x(ans)
 }
