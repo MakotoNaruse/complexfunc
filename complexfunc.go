@@ -78,6 +78,7 @@ func calcByAST(pass *analysis.Pass) (interface{}, error) {
 			fmt.Println("complex", complex)
 		}
 	})
+
 	return nil, nil
 }
 

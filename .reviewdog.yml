@@ -1,10 +1,5 @@
 runner:
-  golint:
-    cmd: golint ./...
-    errorformat:
-      - "%f:%l:%c: %m"
-    level: warning
   govet:
-    cmd: go vet -vettool=`which complecfunc` ./testdata/src/a/
+    cmd: go get github.com/MakotoNaruse/complexfunc/cmd/complexfunc | go vet -vettool=$(which complexfunc)  .
     errorformat:
       - "%f:%l:%c: %m"

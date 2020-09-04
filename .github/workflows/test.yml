@@ -20,3 +20,10 @@ jobs:
 
       - name: Test code
         run: go test -v .
+
+      - name: install complexfunc
+        run: go get github.com/MakotoNaruse/complexfunc/cmd/complexfunc
+
+      - name: Go vet
+        run: go vet -vettool=$(which complexfunc) .
+
