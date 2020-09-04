@@ -94,12 +94,19 @@ func complexity(fn *ssa.Function) int {
 		N = the number of nodes.
 	*/
 	edges := 0
+	returns := 0
 	for _, b := range fn.Blocks {
 		edges += len(b.Succs)
+		for _, instr := range b.Instrs {
+			switch instr.(type) {
+			case *ssa.Return:
+				returns++
+			}
+		}
 	}
 	nodes := len(fn.Blocks)
 	//fmt.Println("n:", nodes, "e:", edges)
-	return edges - nodes + 2
+	return edges - nodes + 2 + returns - 1
 }
 
 func calcByAST(pass *analysis.Pass, scores map[token.Pos]score) map[token.Pos]score {

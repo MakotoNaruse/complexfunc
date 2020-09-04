@@ -46,13 +46,14 @@ func f2() int { // want "function a.f2 is too complicated 12 > 10"
 	return n
 }
 
-func f3() bool {
-	n := 0
+func f3(n int) bool {
 	if n%2 == 0{
-		n++
+		return true
 	}
-	b := n%2 == 0 && n%3 == 0
-	return b
+	if n % 3 == 0 {
+		return true
+	}
+	return false
 }
 
 func f4() int {
@@ -83,4 +84,14 @@ func f6() { // want "function a.f6 has redundant branch"
 	if false {
 	}
 	a++
+}
+
+func f7() int {
+	n := 10
+	var a int
+	switch {
+	case 0 < n && n < 100, n > 200:
+		a = 1
+	}
+	return a
 }
