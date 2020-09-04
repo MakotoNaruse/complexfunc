@@ -83,7 +83,7 @@ func calcBySSA(pass *analysis.Pass, scores map[token.Pos]score) map[token.Pos]sc
 			ssaCmp:   complexity(f),
 			Pos:      f.Pos(),
 		}
-		showDepth(f)
+		//showDepth(f)
 	}
 	return scores
 }
@@ -108,8 +108,8 @@ func complexity(fn *ssa.Function) int {
 		}
 	}
 	nodes := len(fn.Blocks)
-	fmt.Println("n:", nodes, "e:", edges)
-	fmt.Println("score:",edges - nodes + 2 + returns - 1)
+	//fmt.Println("n:", nodes, "e:", edges)
+	//fmt.Println("score:",edges - nodes + 2 + returns - 1)
 	return edges - nodes + 2 + returns - 1
 }
 
@@ -137,8 +137,8 @@ func showDepth(fn *ssa.Function) {
 			}
 		}
 	}
-	fmt.Println(graph.Edges())
-	fmt.Println(returns)
+	//fmt.Println(graph.Edges())
+	//fmt.Println(returns)
 	allShortest := path.DijkstraAllPaths(graph)
 	for _, r := range returns {
 		fmt.Println("to", r, allShortest.Weight(0,int64(r)))
