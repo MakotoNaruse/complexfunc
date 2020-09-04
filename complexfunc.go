@@ -51,7 +51,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		pos := token.Pos(k)
 		score := scores[pos]
 		fmt.Println(score)
-		if score.astCmp > over {
+		if score.ssaCmp > over {
 			pass.Reportf(pos, "function %s.%s is too complicated %d > 10", score.PkgName, score.FuncName, score.astCmp)
 		}
 		if score.ssaCmp < score.astCmp {
