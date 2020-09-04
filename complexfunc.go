@@ -61,23 +61,7 @@ func complexity(fn *ssa.Function) int {
 	return edges - nodes + 2
 }
 
-func calcByAST(pass *analysis.Pass) (interface{}, error) { //change
-	inspect := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
-
-	nodeFilter := []ast.Node{
-		(*ast.FuncDecl)(nil),
-	}
-
-	inspect.Preorder(nodeFilter, func(n ast.Node) {
-		switch n := n.(type) {
-		case *ast.FuncDecl:
-			//fmt.Println("func name:", n.Name)
-			complex := 1
-			complex += calcComplex(n)
-			//fmt.Println("complex", complex)
-		}
-	})
-
+func calcByAST(pass *analysis.Pass) (interface{}, error) {
 	num := 10
 	switch num {
 	case 1:
@@ -103,6 +87,22 @@ func calcByAST(pass *analysis.Pass) (interface{}, error) { //change
 	case 10:
 		num++
 	}
+	
+	inspect := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
+
+	nodeFilter := []ast.Node{
+		(*ast.FuncDecl)(nil),
+	}
+
+	inspect.Preorder(nodeFilter, func(n ast.Node) {
+		switch n := n.(type) {
+		case *ast.FuncDecl:
+			//fmt.Println("func name:", n.Name)
+			complex := 1
+			complex += calcComplex(n)
+			//fmt.Println("complex", complex)
+		}
+	})
 
 	return nil, nil
 }
