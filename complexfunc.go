@@ -86,8 +86,15 @@ func calcComplex(node ast.Node) int {
 	complex := 0
 	ast.Inspect(node, func(n ast.Node) bool {
 		switch n := n.(type) {
-		case *ast.IfStmt, *ast.ForStmt, *ast.RangeStmt, *ast.CaseClause, *ast.CommClause:
+		case *ast.IfStmt, *ast.ForStmt, *ast.RangeStmt:
 			complex++
+		case *ast.CaseClause:
+			// len == 0 is default cause
+			if len(n.List) > 0 {
+				complex++
+			}
+		case *ast.CommClause:
+
 		case *ast.BinaryExpr:
 			if n.Op == token.LAND || n.Op == token.LOR {
 				complex++
