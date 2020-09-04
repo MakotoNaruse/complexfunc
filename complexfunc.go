@@ -1,6 +1,7 @@
 package complexfunc
 
 import (
+	"flag"
 	"fmt"
 	"go/ast"
 	"go/token"
@@ -25,16 +26,12 @@ var Analyzer = &analysis.Analyzer{
 	},
 }
 
-type score struct {
-	PkgName  string
-	FuncName string
-	astCmp   int
-	ssaCmp   int
-	Pos      token.Pos
-}
+var (
+	over  int
+)
 
-func (s score) String() string {
-	return fmt.Sprintf("function: %s.%s\nscore by ast: %d\nscore by ssa: %d", s.PkgName, s.FuncName, s.astCmp, s.ssaCmp)
+func init() {
+	flag.IntVar(&over, "over", 10, "report functions which has complexity > over")
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
@@ -52,7 +49,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		pos := token.Pos(k)
 		score := scores[pos]
 		fmt.Println(score)
-		if score.astCmp > 10 {
+		if score.astCmp > over {
 			pass.Reportf(pos, "function %s.%s is too complicated %d > 10", score.PkgName, score.FuncName, score.astCmp)
 		}
 		if score.ssaCmp < score.astCmp {
@@ -60,6 +57,18 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		}
 	}
 	return nil, nil
+}
+
+type score struct {
+	PkgName  string
+	FuncName string
+	astCmp   int
+	ssaCmp   int
+	Pos      token.Pos
+}
+
+func (s score) String() string {
+	return fmt.Sprintf("function: %s.%s\nscore by ast: %d\nscore by ssa: %d", s.PkgName, s.FuncName, s.astCmp, s.ssaCmp)
 }
 
 func calcBySSA(pass *analysis.Pass, scores map[token.Pos]score) map[token.Pos]score {
