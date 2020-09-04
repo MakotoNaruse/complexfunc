@@ -94,7 +94,10 @@ func calcComplex(node ast.Node) int {
 				complex++
 			}
 		case *ast.CommClause:
-
+			// Comm == nil is default cause
+			if n.Comm != nil {
+				complex++
+			}
 		case *ast.BinaryExpr:
 			if n.Op == token.LAND || n.Op == token.LOR {
 				complex++
