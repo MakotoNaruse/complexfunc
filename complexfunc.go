@@ -137,9 +137,7 @@ func calcComplex(node ast.Node) int {
 			complex++
 		case *ast.CaseClause:
 			// len == 0 is default cause
-			if len(n.List) > 0 {
-				complex++
-			}
+			complex += len(n.List)
 		case *ast.CommClause:
 			// Comm == nil is default cause
 			if n.Comm != nil {
