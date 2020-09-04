@@ -5,7 +5,11 @@
 
 `complexfunc` finds too complicated function.
 
-Reported if cyclomatic complexity calculated by SSA exceeds 10.
+Reported if cyclomatic complexity calculated by SSA exceeds n (default 10).
+
+We also calculate cyclomatic complexity by AST and report if cyclo by SSA < AST
+
+In that case, there are redundant branches and SSA removed them.
 
 ## example
 ```go
@@ -26,7 +30,7 @@ func f1() int {
 	return ans
 }
 
-func f2() int { // want "function f2 is too complicated 12 > 10"
+func f2() int { // want "function a.f2 is too complicated 12 > 10"
 	n := 10
 	switch n {
 	case 1:
@@ -54,19 +58,24 @@ func f2() int { // want "function f2 is too complicated 12 > 10"
 	}
 	return n
 }
+func f3(a int) int { // want "function a.f3 has redundant branch"
+	if false {
+	}
+	return a + 1
+}
 ```
 ```console
-Calculated by AST Search
-func name: f1
-complex 4
-func name: f2
-complex 12
-Calculated by SSA and Control Graph
-func name: f1
-complex: 4
-func name: f2
-complex: 12
-./a.go:18:1: function f1 is too complicated 12 > 10
+function: a.f1
+score by ast: 4
+score by ssa: 4
+function: a.f2
+score by ast: 12
+score by ssa: 12
+function: a.f3
+score by ast: 2
+score by ssa: 1
+./a.go:18:1: function a.f1 is too complicated 12 > 10
+./a.go:46:1: function a.f3 has redundant branch
 ```
 
 ## how to calculate?
@@ -90,5 +99,7 @@ $ go get github.com/MakotoNaruse/complexfunc/cmd/complexfunc
 ## Usage
 
 ```sh
-$ go vet -vettool=`which complecfunc` pkgname
+$ go vet -vettool=`which complecfunc` [flag] pkgname
+Flags:
+      -over N   report if complexity > N (default 10)
 ```
