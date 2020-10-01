@@ -101,5 +101,5 @@ $ go get github.com/MakotoNaruse/complexfunc/cmd/complexfunc
 ```sh
 $ go vet -vettool=`which complecfunc` [flag] pkgname
 Flags:
-      -over N   report if complexity > N (default 10)
+      --over N   report if complexity > N (default 10)
 ```
